@@ -1,0 +1,121 @@
+{
+  "version": 7,
+  "style": "live_action",
+  "title": "The Purr-fect Presentation",
+  "scenePlace": "University café",
+  "sceneSituation": "Emma accidentally emailed her cat's birthday slideshow instead of their academic presentation slides.",
+  "cleanFilename": "clean_live_action_v7_102d535001ddc417.mp4",
+  "subtitledFilename": "subtitled_live_action_v7_102d535001ddc417.mp4",
+  "cleanUrl": "/api/video/master/live_action/clean_live_action_v7_102d535001ddc417.mp4",
+  "subtitledUrl": "/api/video/master/live_action/subtitled_live_action_v7_102d535001ddc417.mp4",
+  "totalDurationSec": 30.46,
+  "beatStarts": {
+    "hook": {
+      "startSec": 0,
+      "endSec": 7,
+      "durationSec": 7
+    },
+    "problem": {
+      "startSec": 7,
+      "endSec": 15.07,
+      "durationSec": 8.07
+    },
+    "turn": {
+      "startSec": 15.07,
+      "endSec": 23.07,
+      "durationSec": 8
+    },
+    "close": {
+      "startSec": 23.07,
+      "endSec": 30.46,
+      "durationSec": 7.39
+    }
+  },
+  "subtitleCuesByBeat": {
+    "hook": [
+      {
+        "speaker": "Chloe",
+        "text": "You look nervous.",
+        "startSec": 0,
+        "endSec": 1.04
+      },
+      {
+        "speaker": "Chloe",
+        "text": "Did you email our slides?",
+        "startSec": 1.34,
+        "endSec": 2.8
+      },
+      {
+        "speaker": "Emma",
+        "text": "Not exactly.",
+        "startSec": 3.25,
+        "endSec": 4.65
+      },
+      {
+        "speaker": "Emma",
+        "text": "Please don't freak out.",
+        "startSec": 4.73,
+        "endSec": 6.33
+      }
+    ],
+    "problem": [
+      {
+        "speaker": "Emma",
+        "text": "I was going to send our professor the slides,",
+        "startSec": 0,
+        "endSec": 2.72
+      },
+      {
+        "speaker": "Emma",
+        "text": "but I sent my cat's birthday slideshow instead.",
+        "startSec": 2.8,
+        "endSec": 5.2
+      },
+      {
+        "speaker": "Emma",
+        "text": "I'm mortified.",
+        "startSec": 5.56,
+        "endSec": 6.68
+      }
+    ],
+    "turn": [
+      {
+        "speaker": "Chloe",
+        "text": "Let me see.",
+        "startSec": 0.02,
+        "endSec": 0.64
+      },
+      {
+        "speaker": "Chloe",
+        "text": "Wait, he replied!",
+        "startSec": 1.08,
+        "endSec": 2.84
+      },
+      {
+        "speaker": "Chloe",
+        "text": "He says your cat gets extra credit for excellent visual aids.",
+        "startSec": 3.32,
+        "endSec": 6.78
+      }
+    ],
+    "close": [
+      {
+        "speaker": "Emma",
+        "text": "That made my whole day.",
+        "startSec": 0.03,
+        "endSec": 1.31
+      },
+      {
+        "speaker": "Emma",
+        "text": "My cat is doing better in college than I am.",
+        "startSec": 1.63,
+        "endSec": 4.25
+      }
+    ]
+  },
+  "hasLaughTrackByBeat": {
+    "problem": true
+  },
+  "editPlanSummary": [],
+  "updatedAt": "2026-11-27T15:41:21.350Z"
+}

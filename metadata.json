@@ -1,0 +1,6 @@
+{
+  "name": "CineLingo",
+  "description": "Turn English expressions from movies into a 30-second animated clip with English voice and subtitles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
