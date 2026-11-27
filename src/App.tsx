@@ -255,7 +255,7 @@ function buildInitialMediaFromStoryboard(
   return initialMedia;
 }
 
-export default function App() {
+function FullStudioApp() {
   const initialWorkspaceRef = useRef<PersistedWorkspaceState | null | undefined>(undefined);
   if (initialWorkspaceRef.current === undefined) {
     initialWorkspaceRef.current = loadWorkspaceState();
@@ -1538,4 +1538,246 @@ export default function App() {
       </main>
     </div>
   );
+}
+
+
+// Standalone presentation mode: original studio implementation above is preserved.
+const PRESENTATION_MODE = true;
+const DEMO_MASTER: PersistedMasterVideoInfo = {
+  "style": "live_action",
+  "title": "The Purr-fect Presentation",
+  "scenePlace": "University café",
+  "sceneSituation": "Emma accidentally emailed her cat's birthday slideshow instead of their academic presentation slides.",
+  "totalDurationSec": 30.46,
+  "beatStarts": {
+    "hook": {
+      "startSec": 0,
+      "endSec": 7,
+      "durationSec": 7
+    },
+    "problem": {
+      "startSec": 7,
+      "endSec": 15.07,
+      "durationSec": 8.07
+    },
+    "turn": {
+      "startSec": 15.07,
+      "endSec": 23.07,
+      "durationSec": 8
+    },
+    "close": {
+      "startSec": 23.07,
+      "endSec": 30.46,
+      "durationSec": 7.39
+    }
+  },
+  "subtitleCuesByBeat": {
+    "hook": [
+      {
+        "speaker": "Chloe",
+        "text": "You look nervous.",
+        "startSec": 0,
+        "endSec": 1.04
+      },
+      {
+        "speaker": "Chloe",
+        "text": "Did you email our slides?",
+        "startSec": 1.34,
+        "endSec": 2.8
+      },
+      {
+        "speaker": "Emma",
+        "text": "Not exactly.",
+        "startSec": 3.25,
+        "endSec": 4.65
+      },
+      {
+        "speaker": "Emma",
+        "text": "Please don't freak out.",
+        "startSec": 4.73,
+        "endSec": 6.33
+      }
+    ],
+    "problem": [
+      {
+        "speaker": "Emma",
+        "text": "I was going to send our professor the slides,",
+        "startSec": 0,
+        "endSec": 2.72
+      },
+      {
+        "speaker": "Emma",
+        "text": "but I sent my cat's birthday slideshow instead.",
+        "startSec": 2.8,
+        "endSec": 5.2
+      },
+      {
+        "speaker": "Emma",
+        "text": "I'm mortified.",
+        "startSec": 5.56,
+        "endSec": 6.68
+      }
+    ],
+    "turn": [
+      {
+        "speaker": "Chloe",
+        "text": "Let me see.",
+        "startSec": 0.02,
+        "endSec": 0.64
+      },
+      {
+        "speaker": "Chloe",
+        "text": "Wait, he replied!",
+        "startSec": 1.08,
+        "endSec": 2.84
+      },
+      {
+        "speaker": "Chloe",
+        "text": "He says your cat gets extra credit for excellent visual aids.",
+        "startSec": 3.32,
+        "endSec": 6.78
+      }
+    ],
+    "close": [
+      {
+        "speaker": "Emma",
+        "text": "That made my whole day.",
+        "startSec": 0.03,
+        "endSec": 1.31
+      },
+      {
+        "speaker": "Emma",
+        "text": "My cat is doing better in college than I am.",
+        "startSec": 1.63,
+        "endSec": 4.25
+      }
+    ]
+  },
+  "hasLaughTrackByBeat": {
+    "problem": true
+  },
+  "updatedAt": "2026-11-27T15:41:21.350Z",
+  "cleanUrl": "/src/assets/videos/masters/live_action/clean_live_action_v7_102d535001ddc417.mp4",
+  "subtitledUrl": "/src/assets/videos/masters/live_action/subtitled_live_action_v7_102d535001ddc417.mp4"
+};
+
+const DEMO_SCENE: SceneSetup = { ...DEFAULT_SCENE, style: 'live_action' };
+
+function PresentationApp() {
+  const [step, setStep] = useState<AppStep>('expressions');
+  const [expressions, setExpressions] = useState<CourseExpression[]>([]);
+  const [scene, setScene] = useState<SceneSetup>({ ...DEMO_SCENE });
+  const [board, setBoard] = useState<StoryboardData | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const allSelected = expressions.length === FIXED_EXPRESSIONS.length;
+  const isOriginal = Boolean(board && board.beats.length === ORIGINAL_STORYBOARD.beats.length &&
+    scene.style === 'live_action' && scene.characters.trim() === DEMO_SCENE.characters &&
+    board.beats.every((beat) => isOriginalBeatScriptUnchanged(beat, scene)));
+  const media = useMemo(() => board ? buildInitialMediaFromStoryboard(board, scene, {}, {}) : {}, [board, scene]);
+
+  useEffect(() => { preloadStyleAssets().catch(() => {}); }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, [step]);
+
+  const openStoryboard = () => {
+    setBoard((previous) => previous ?? cloneOriginalStoryboard(scene.style));
+    setNotice(null);
+    setStep('storyboard');
+  };
+  const restoreDemo = (next: AppStep) => {
+    setExpressions([...FIXED_EXPRESSIONS]);
+    setScene({ ...DEMO_SCENE });
+    setBoard(cloneOriginalStoryboard('live_action'));
+    setNotice(null);
+    setStep(next);
+  };
+  const labels: Record<AppStep, string> = {
+    expressions: 'Set the Scene', scene: 'Storyboard', storyboard: 'Studio Production',
+    video: 'Now Showing', final: 'Choose Lines',
+  };
+  const navigate = (target: AppStep) => {
+    if (target !== 'expressions' && !allSelected) return;
+    if ((target === 'storyboard' || target === 'video') && !board) return;
+    if (target === 'final' && !isOriginal) return;
+    setStep(target);
+  };
+  const primaryAction = () => {
+    switch (step) {
+      case 'expressions': if (allSelected) setStep('scene'); break;
+      case 'scene': openStoryboard(); break;
+      case 'storyboard': setStep('video'); break;
+      case 'video': if (isOriginal) setStep('final'); break;
+      case 'final': setStep('expressions'); break;
+    }
+  };
+  return (
+    <div className="min-h-screen cinelingo-canvas-bg text-[#F5F0E6]">
+      <TopBar currentStep={step} onSelectStep={navigate}
+        canAccessScene={allSelected} canAccessStoryboard={Boolean(board) && allSelected}
+        canAccessVideo={Boolean(board) && allSelected} canAccessFinal={isOriginal && allSelected}
+        onPrimaryAction={primaryAction} primaryActionLabel={labels[step]}
+        primaryActionDisabled={(step === 'expressions' && !allSelected) || (step === 'video' && !isOriginal)} />
+      {step !== 'final' && (
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
+          <div className="liquid-glass-panel rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+            <span className="text-[#F5F0E6]/90"><span className="font-semibold text-[#E5C9AD]">Presentation Demo:</span>{' '}
+              Live-action film ready · Other styles available as storyboard previews · No API calls for playback.</span>
+            <button type="button" onClick={() => restoreDemo('final')}
+              className="liquid-glass-btn-primary min-h-[36px] px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold">Watch Moving Video</button>
+          </div>
+        </div>
+      )}
+      <main>
+        {step === 'expressions' && <ExpressionStep selectedExpressions={expressions}
+          onChange={setExpressions} onNext={() => { if (allSelected) setStep('scene'); }} />}
+        {step === 'scene' && <SceneStep scene={scene} onChange={(next) => {
+          setScene(next); setNotice(null);
+          if (board && scene.style !== next.style) setBoard({ ...board, beats: board.beats.map((beat) => ({
+            ...beat, visualDirection: getLocalBeatDirection(beat.id, next.style),
+          })) });
+        }} onBack={() => setStep('expressions')} onContinueToStoryboard={openStoryboard} />}
+        {step === 'storyboard' && board && <StoryboardStep storyboard={board} style={scene.style}
+          onUpdateBeat={(id, updated) => setBoard((prev) => prev ? { ...prev, beats: prev.beats.map((beat) => beat.id === id ? updated : beat) } : prev)}
+          onRegenerateBeatVisual={async () => setNotice('New visual generation is disabled in the presentation demo. The original storyboard previews remain available.')}
+          onResetToOriginal={() => { setBoard(cloneOriginalStoryboard(scene.style)); setNotice(null); }}
+          regeneratingBeatId={null} errorMessage={notice} onBack={() => setStep('scene')}
+          onProceedToVideo={() => setStep('video')} />}
+        {step === 'video' && board && (
+          <section className="cinema-enter max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-32 md:pb-16">
+            <p className="text-sm font-medium text-[#E5C9AD] mb-2">Act IV · Studio Production</p>
+            <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight">Lights, Camera, Action!</h1>
+            <p className="mt-3 text-base sm:text-lg text-[#F5F0E6]/80">This presentation edition uses previously generated footage. No new AI generation is performed.</p>
+            <div className="liquid-glass-panel rounded-[22px] p-5 sm:p-7 mt-7 space-y-4">
+              <div><p className="text-xs font-semibold text-[#E5C9AD]">{isOriginal ? 'SAVED MOVING VIDEO · LIVE-ACTION' : 'STORYBOARD PREVIEW'}</p>
+                <h2 className="font-display text-2xl font-bold mt-1">{board.title}</h2></div>
+              {isOriginal ? <>
+                <p className="text-sm text-[#F5F0E6]/85">All four scenes are available in one finished MP4 with English voices, subtitles and closing credits.</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">{board.beats.map((beat, index) => <div key={beat.id} className="liquid-glass-ivory rounded-2xl p-3 text-[#21191B]">
+                  <p className="text-xs text-[#722F37] font-semibold">{beat.timeRange}</p><p className="font-semibold">0{index + 1}. {beat.label}</p><p className="text-xs mt-1">Ready</p>
+                </div>)}</div>
+                <button type="button" onClick={() => setStep('final')} className="liquid-glass-btn-primary min-h-[48px] px-6 py-3 rounded-full font-semibold">Watch Final Video</button>
+              </> : <>
+                <p className="text-sm text-[#F5F0E6]/85">Only the original Live-action script has a completed video. Other styles and edited scripts are previews, not newly generated films.</p>
+                <button type="button" onClick={() => restoreDemo('video')} className="liquid-glass-btn-primary min-h-[48px] px-6 py-3 rounded-full font-semibold">Restore Original Live-action Film</button>
+              </>}
+              <button type="button" onClick={() => setStep('storyboard')} className="liquid-glass-btn-secondary min-h-[44px] px-5 py-2 rounded-full text-sm font-semibold ml-2">Back to Storyboard</button>
+            </div>
+          </section>
+        )}
+        {step === 'final' && board && isOriginal && <>
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
+            <div className="liquid-glass-panel rounded-2xl px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E6]/90">
+              Presentation demo · Previously generated Live-action film.{' '}
+              <a href={DEMO_MASTER.subtitledUrl} target="_blank" rel="noreferrer" className="underline text-[#E5C9AD]">Open saved MP4 directly</a>
+            </div>
+          </div>
+          <FinalPlayerStep storyboard={board} scene={scene} expressions={expressions} beatMedia={media}
+            persistedMaster={DEMO_MASTER} slideshowFallbackMode={false} onBackToStoryboard={() => setStep('storyboard')} />
+        </>}
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return PRESENTATION_MODE ? <PresentationApp /> : <FullStudioApp />;
 }
